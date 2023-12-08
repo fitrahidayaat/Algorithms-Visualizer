@@ -10,7 +10,7 @@ export default function Home() {
                 Algorithms-visualizer
             </h1>
             <div className="flex justify-center gap-6">
-                <Card title="Path Finder" tags={["bfs", "dfs", "A*"]} src="/maze.jpg" href="/path-finding"></Card>
+                <Card title="Path Finder" tags={["bfs", "dfs", "A*"]} src="/path_finder.png" href="/path-finding"></Card>
                 <Card title="Sorting" tags={["array"]} src="/maze.jpg" href="sorting"></Card>
             </div>
         </div>
