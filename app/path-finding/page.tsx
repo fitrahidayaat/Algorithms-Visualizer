@@ -1,8 +1,9 @@
 "use client";
+import { parse } from "path";
 import React, { useState } from "react";
+import Select from "react-select";
 
 export default function PathFinding() {
-    const [selectedValue, setSelectedValue] = useState("option1");
     const [mode, setMode] = useState("nothing");
 
     const [startMarked, setStartMarked] = useState(false);
@@ -13,9 +14,14 @@ export default function PathFinding() {
 
     const [isMouseDown, setIsMouseDown] = useState(false);
 
-    const handleRadioChange = (value : any) => {
-        setSelectedValue(value);
-    };
+    const options = [
+        { value: 'BFS', label: 'BFS' },
+        { value: 'DFS', label: 'DFS' },
+        { value: 'A*', label: 'A*' },
+    ];
+    const [selectedOption, setSelectedOption] = useState(null);
+
+
 
     const [grid, setGrid] = useState([
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -38,30 +44,23 @@ export default function PathFinding() {
     const gridClick = (e : any) => {
         const row = e.target.dataset.row;
         const col = e.target.dataset.col;
-        
         if(mode === "start"){
             if(!startMarked){
                 setStartMarked(true);
                 if(grid[row][col] === 0){
-                    setStartNode(e.target);
                     grid[row][col] = 1;
-                    setGrid(grid);
                     e.target.classList.add("bg-green-600");
                 } else if(grid[row][col] === 2){
-                    setStartNode(e.target);
                     setEndMarked(false);
                     grid[row][col] = 1;
-                    setGrid(grid);
                     e.target.classList.remove("bg-red-600");
                     e.target.classList.add("bg-green-600");
                 } else if(grid[row][col] === 3){
-                    setStartNode(e.target);
                     grid[row][col] = 1;
-                    setGrid(grid);
-                    e.target.classList.remove("bg-slate-800");
+                    e.target.classList.remove("bg-stone-800");
                     e.target.classList.add("bg-green-600");
                 }
-                
+                setStartNode(e.target);
             } else{
                 startNode.classList.remove("bg-green-600");
                 if(grid[row][col] === 0){
@@ -77,35 +76,27 @@ export default function PathFinding() {
                     e.target.classList.add("bg-green-600");
                 } else if(grid[row][col] === 3){
                     grid[row][col] = 1;
-                    e.target.classList.remove("bg-slate-800");
+                    e.target.classList.remove("bg-stone-800");
                     e.target.classList.add("bg-green-600");
                 }
                 grid[startNode.dataset.row][startNode.dataset.col] = 0;
-                setGrid(grid);
                 setStartNode(e.target);
             }
         } else if(mode === "end"){
             if(!endMarked){
                 setEndMarked(true);
                 if(grid[row][col] === 0){
-                    setEndNode(e.target);
-                    grid[row][col] = 2;
-                    setGrid(grid);
                     e.target.classList.add("bg-red-600");
                 } else if(grid[row][col] === 1){
-                    setEndNode(e.target);
                     setStartMarked(false);
-                    grid[row][col] = 2;
-                    setGrid(grid);
                     e.target.classList.remove("bg-green-600");
                     e.target.classList.add("bg-red-600");
                 } else if(grid[row][col] === 3){
-                    setEndNode(e.target);
-                    grid[row][col] = 2;
-                    setGrid(grid);
-                    e.target.classList.remove("bg-slate-800");
+                    e.target.classList.remove("bg-stone-800");
                     e.target.classList.add("bg-red-600");
                 }
+                setEndNode(e.target);
+                grid[row][col] = 2;
             } else{
                 if(grid[row][col] === 0){
                     setEndNode(e.target);
@@ -124,32 +115,25 @@ export default function PathFinding() {
                 } else if(grid[row][col] === 3){
                     setEndNode(e.target);
                     grid[row][col] = 2;
-                    e.target.classList.remove("bg-slate-800");
+                    e.target.classList.remove("bg-stone-800");
                     e.target.classList.add("bg-red-600");
                 }
                 grid[endNode.dataset.row][endNode.dataset.col] = 0;
                 endNode.classList.remove("bg-red-600");
-                setGrid(grid);
             }
         } else if(mode === "wall"){
             if(grid[row][col] === 0){
-                grid[row][col] = 3;
-                e.target.classList.add("bg-slate-800");
+                e.target.classList.add("bg-stone-800");
             } else if(grid[row][col] === 1){
-                grid[row][col] = 3;
                 setStartMarked(false);
                 e.target.classList.remove("bg-green-600");
-                e.target.classList.add("bg-slate-800");
+                e.target.classList.add("bg-stone-800");
             } else if(grid[row][col] === 2){
-                grid[row][col] = 3;
                 setEndMarked(false);
                 e.target.classList.remove("bg-red-600");
-                e.target.classList.add("bg-slate-800");
+                e.target.classList.add("bg-stone-800");
             }
-            setGrid(grid);
-
-        } else if(mode == "nothing"){
-
+            grid[row][col] = 3;
         } else if(mode == "erase"){
             if(grid[row][col] === 1){
                 setStartMarked(false);
@@ -159,14 +143,11 @@ export default function PathFinding() {
             grid[row][col] = 0;
             e.target.classList.remove("bg-green-600");
             e.target.classList.remove("bg-red-600");
-            e.target.classList.remove("bg-slate-800");
-            setGrid(grid);
+            e.target.classList.remove("bg-stone-800");
+            e.target.classList.remove("bg-blue-600");
+            e.target.classList.remove("bg-yellow-600");
         }
-        console.log(e.target);
-        console.log(grid);
-        console.log(mode);
-        console.log(startMarked);
-        console.log(endMarked)
+        setGrid(grid);
 
     }
 
@@ -201,10 +182,167 @@ export default function PathFinding() {
             alert("start not marked");
         } else if(!endMarked){
             alert("end not marked");
+        } else if(!selectedOption){
+            alert("select an algorithm");
+        } else{
+            if(selectedOption.value === "BFS"){
+                bfs();
+            } else if(selectedOption.value === "DFS"){
+                dfs();
+            } else if(selectedOption.value === "A*"){
+                astar();
+            }
         }
+    }
+    const animateSearch = (arr, x : number, y : number) => {
+        for(let i = 0; i < arr.length; i++){
+            const x = document.querySelector(`[data-row="${arr[i][0]}"][data-col="${arr[i][1]}"]`);
+            if (!x?.classList.contains("bg-green-600") && !x?.classList.contains("bg-red-600")) {
+                setTimeout(() => {
+                    x?.classList.add("bg-blue-600");
+                }, i * 25); // Change 1000 to the desired delay in milliseconds (1 second in this example)
+            }
+        }
+        const d = arr.length*25;
+        let i = 1;
+        while(x !== -1 && y !== -1){
+            [x, y] = [par[x][y][0], par[x][y][1]];
+            console.log(x,y);
+            const z = document.querySelector(`[data-row="${x}"][data-col="${y}"]`);
+            if (!z?.classList.contains("bg-green-600") && !z?.classList.contains("bg-red-600")) {
+                setTimeout(() => {
+                    z?.classList.remove("bg-blue-600");
+                    z?.classList.add("bg-yellow-600");
+                }, d + i*50); 
+            }
+            i++;
+        }
+    }
+
+    const [par, setPar] = useState([
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+        [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+    ]);
+    const bfs = () => {
+        let queue = [[startNode.dataset.row, startNode.dataset.col]];
+        let cnt = 0;
+        let x = endNode.dataset.row;
+        let y = endNode.dataset.col;
+        x = parseInt(x);
+        y = parseInt(y);
+        grid[parseInt(startNode.dataset.row)][parseInt(startNode.dataset.col)] = 4;
+        const arr = [];
+        console.log(grid);
+        while(queue.length !== 0){
+            let [i, j] = queue.shift();
+            i = parseInt(i);
+            j = parseInt(j);
+            arr.push([i, j]);
+            if(i === x && j === y){
+                console.log("found");
+                break;
+            }
+            if(i > 0 && (grid[i-1][j] === 0 || grid[i-1][j] === 2)){
+                queue.push([i-1, j]);
+                par[i-1][j] = [i, j];
+                grid[i-1][j] = 4;
+            }
+            if(i < grid.length-1 && (grid[i+1][j] === 0 || grid[i+1][j] === 2)){
+                queue.push([i+1, j]);
+                par[i+1][j] = [i, j];
+                grid[i+1][j] = 4;
+            }
+            if(j > 0 && (grid[i][j-1] === 0 || grid[i][j-1] === 2)){
+                par[i][j-1] = [i, j];
+                queue.push([i, j-1]);
+                grid[i][j-1] = 4;
+            }
+            if(j < grid[0].length-1 && (grid[i][j+1] === 0 || grid[i][j+1] === 2)){
+                par[i][j+1] = [i, j];
+                queue.push([i, j+1]);
+                grid[i][j+1] = 4;
+            }
+        }
+        setPar(par);
+        setGrid(grid);
+        animateSearch(arr, x, y);
+        // animatePath(x, y);
+    }
+
+    const dfs = () => {
+        let queue = [[startNode.dataset.row, startNode.dataset.col]];
+        let x = endNode.dataset.row;
+        let y = endNode.dataset.col;
+        x = parseInt(x);
+        y = parseInt(y);
+        grid[parseInt(startNode.dataset.row)][parseInt(startNode.dataset.col)] = 4;
+        const arr = [];
+        console.log(grid);
+        while(queue.length !== 0){
+            let [i, j] = queue.pop();
+            i = parseInt(i);
+            j = parseInt(j);
+            arr.push([i, j]);
+            if(i === x && j === y){
+                console.log("found");
+                break;
+            }
+            if(i > 0 && (grid[i-1][j] === 0 || grid[i-1][j] === 2)){
+                queue.push([i-1, j]);
+                par[i-1][j] = [i, j];
+                grid[i-1][j] = 4;
+            }
+            if(i < grid.length-1 && (grid[i+1][j] === 0 || grid[i+1][j] === 2)){
+                queue.push([i+1, j]);
+                par[i+1][j] = [i, j];
+                grid[i+1][j] = 4;
+            }
+            if(j > 0 && (grid[i][j-1] === 0 || grid[i][j-1] === 2)){
+                par[i][j-1] = [i, j];
+                queue.push([i, j-1]);
+                grid[i][j-1] = 4;
+            }
+            if(j < grid[0].length-1 && (grid[i][j+1] === 0 || grid[i][j+1] === 2)){
+                par[i][j+1] = [i, j];
+                queue.push([i, j+1]);
+                grid[i][j+1] = 4;
+            }
+        }
+        setPar(par);
+        setGrid(grid);
+        animateSearch(arr, x, y);
+    }
+    const astar = () => {
+        console.log("astar");
     }
     const eraseClick = () => {
         setMode("erase");
+    }
+    const resetClick = () => {
+        for(let i = 0; i < grid.length; i++){
+            for(let j = 0; j < grid[0].length; j++){
+                grid[i][j] = 0;
+                const x = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+                x?.classList.remove("bg-green-600");
+                x?.classList.remove("bg-red-600");
+                x?.classList.remove("bg-stone-800");
+                x?.classList.remove("bg-blue-600");
+                x?.classList.remove("bg-yellow-600");
+            }
+        }   
+        setGrid(grid);
     }
     
 
@@ -223,12 +361,17 @@ export default function PathFinding() {
                 <button className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-lg" onClick={goClick} >
                     Go!
                 </button>
-                <button className="bg-black hover:bg-slate-800 text-white px-3 py-1 rounded text-lg" onClick={wallClick}>
+                <button className="bg-black hover:bg-stone-800 text-white px-3 py-1 rounded text-lg" onClick={wallClick}>
                     wall
                 </button>
-                <button className="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1 rounded text-lg" onClick={eraseClick}>
+                <button className="bg-stone-600 hover:bg-stone-700 text-white px-3 py-1 rounded text-lg" onClick={eraseClick}>
                     erase
                 </button>
+                <Select
+                    defaultValue={selectedOption}
+                    onChange={setSelectedOption}
+                    options={options}
+                />
             </div>
             <br/>
             <div className="flex justify-center">
@@ -236,37 +379,27 @@ export default function PathFinding() {
                     {grid.map((row, i) => (
                         <div key={i} className="flex">
                             {row.map((item, j) => (
-                                <div
-                                    className={`h-8 w-8 border-slate-300 border-[1px]`}
+                                <span
+                                    className={`h-8 w-8 border-stone-800 border-[1px] transition-all duration-200`}
                                     data-row={i}
                                     data-col={j}
                                     key={j}
                                     onMouseDown={handleMouseDown}
                                     onMouseUp={handleMouseUp}
                                     onMouseOver={handleMouseEnter}
+                                    draggable="false"
                                 >
                                     
-                                </div>
+                                </span>
                             ))}
                         </div>
                     ))}
                 </div>
             </div>
-            <div>
-                <input
-                    type="radio"
-                    value="option1"
-                    checked={selectedValue === "option1"}
-                    onChange={() => handleRadioChange("option1")}
-                />
-                Option 1
-                <input
-                    type="radio"
-                    value="option2"
-                    checked={selectedValue === "option2"}
-                    onChange={() => handleRadioChange("option2")}
-                />
-                Option 2
+            <div className="flex justify-center mt-8">
+                <button className="bg-black hover:bg-slate-700 text-white px-3 py-1 rounded text-lg " onClick={resetClick}>
+                    reset
+                </button>
             </div>
         </>
     );
