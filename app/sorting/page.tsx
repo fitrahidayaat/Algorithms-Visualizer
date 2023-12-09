@@ -33,12 +33,12 @@ export default function Sorting() {
     };
 
     const select = (number: number) => {
-        const node = document.getElementById(number.toString());
+        const node = document.getElementById(number.toString()) as HTMLElement;
         node.classList.add("bg-red-600");
     };
 
     const unSelect = (number: number) => {
-        const node = document.getElementById(number.toString());
+        const node = document.getElementById(number.toString()) as HTMLElement;
         node.classList.remove("bg-red-600");
     };
 
@@ -51,8 +51,8 @@ export default function Sorting() {
     };
 
     const animateSwap = (id1: number, id2: number) => {
-        const node1 = document.getElementById(id1.toString());
-        const node2 = document.getElementById(id2.toString());
+        const node1 = document.getElementById(id1.toString()) as HTMLElement;
+        const node2 = document.getElementById(id2.toString()) as HTMLElement;
         // swap height
         const temp = node1.style.height;
         node1.style.height = node2.style.height;
@@ -190,7 +190,7 @@ export default function Sorting() {
                 .concat(right.slice(rightIndex));
         };
 
-        const mergeSortHelper = (array: number[]) => {
+        const mergeSortHelper = (array: number[]) : any => {
             if (array.length <= 1) {
                 return array;
             }
@@ -249,7 +249,7 @@ export default function Sorting() {
         for(let i = 0; i < 1000000; i++){
             window.clearTimeout(i);
         }
-        const input = document.getElementById("input-numbers");
+        const input = document.getElementById("input-numbers") as HTMLInputElement;
         const numbersArray = input.value
             .split(",")
             .map((number) => parseInt(number.trim()));

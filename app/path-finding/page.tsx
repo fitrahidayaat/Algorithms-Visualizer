@@ -8,7 +8,7 @@ export default function PathFinding() {
     const [mode, setMode] = useState("nothing");
 
     const [startMarked, setStartMarked] = useState(false);
-    const [startNode, setStartNode] = useState();
+    const [startNode, setStartNode] = useState(null);
 
     const [endMarked, setEndMarked] = useState(false);
     const [endNode, setEndNode] = useState(null);
