@@ -3,15 +3,18 @@ import { parse } from "path";
 import React, { useState } from "react";
 import Select from "react-select";
 import PriorityQueue from "../util/priority_queue";
+import { start } from "repl";
 
 export default function PathFinding() {
     const [mode, setMode] = useState("nothing");
 
     const [startMarked, setStartMarked] = useState(false);
-    const [startNode, setStartNode] = useState(null);
+
+    // set the startNode as html element
+    const [startNode, setStartNode] = useState(document.getElementById("temp") as HTMLDivElement);
 
     const [endMarked, setEndMarked] = useState(false);
-    const [endNode, setEndNode] = useState(null);
+    const [endNode, setEndNode] = useState(document.getElementById("temp") as HTMLDivElement);
 
     const [isMouseDown, setIsMouseDown] = useState(false);
 
@@ -57,7 +60,11 @@ export default function PathFinding() {
                     e.target.classList.remove("bg-stone-800");
                     e.target.classList.add("bg-green-600");
                 }
-                grid[startNode.dataset.row][startNode.dataset.col] = 0;
+                if(startNode.dataset.row != undefined && startNode.dataset.col != undefined){
+                    let r = parseInt(startNode.dataset.row);
+                    let c = parseInt(startNode.dataset.col);
+                    grid[r][c] = 0;
+                }
                 setStartNode(e.target);
             }
         } else if(mode === "end"){
@@ -96,7 +103,11 @@ export default function PathFinding() {
                     e.target.classList.remove("bg-stone-800");
                     e.target.classList.add("bg-red-600");
                 }
-                grid[endNode.dataset.row][endNode.dataset.col] = 0;
+                if(endNode.dataset.row != undefined && endNode.dataset.col != undefined){
+                    let r = parseInt(endNode.dataset.row);
+                    let c = parseInt(endNode.dataset.col);
+                    grid[r][c] = 0;
+                }
                 endNode.classList.remove("bg-red-600");
             }
         } else if(mode === "wall"){
@@ -164,7 +175,7 @@ export default function PathFinding() {
             bfs();
         }
     }
-    const animateSearch = (arr :number[], x : number, y : number) => {
+    const animateSearch = (arr :number[][], x : number, y : number) => {
         // reverse arr
         
         for(let i = 0; i < arr.length; i++){
@@ -178,7 +189,9 @@ export default function PathFinding() {
         const d = arr.length*25;
         let i = 1;
         const b = [];
-        par[parseInt(startNode.dataset.row)][parseInt(startNode.dataset.col)] = [-1, -1];
+        if(startNode.dataset.row != undefined && startNode.dataset.col != undefined){
+            par[parseInt(startNode.dataset.row)][parseInt(startNode.dataset.col)] = [-1, -1];
+        }
         while(x !== -1 && y !== -1){
             [x, y] = [par[x][y][0], par[x][y][1]];
             b.unshift([x, y]);
@@ -196,18 +209,28 @@ export default function PathFinding() {
     const [par, setPar] = useState(Array.from({ length: grid.length }, () => Array.from({ length: grid[0].length }, () => [-1, -1])));
 
     const bfs = () => {
-        let queue = [[startNode.dataset.row, startNode.dataset.col]];
+        let queue : number[][] = [];
+        if(startNode.dataset.row != undefined && startNode.dataset.col != undefined){
+            queue = [[parseInt(startNode.dataset.row), parseInt(startNode.dataset.col)]];
+        }
         let cnt = 0;
-        let x = endNode.dataset.row;
-        let y = endNode.dataset.col;
-        x = parseInt(x);
-        y = parseInt(y);
-        grid[parseInt(startNode.dataset.row)][parseInt(startNode.dataset.col)] = 4;
+        let x : number = -1, y : number = -1;
+        if(endNode.dataset.row != undefined && endNode.dataset.col != undefined){
+            x = parseInt(endNode.dataset.row);
+            y = parseInt(endNode.dataset.col);
+        
+        }
+        if(startNode.dataset.row != undefined && startNode.dataset.col != undefined){
+            grid[parseInt(startNode.dataset.row)][parseInt(startNode.dataset.col)] = 4;
+        }
         const arr = [];
         while(queue.length !== 0){
-            let [i, j] = queue.shift();
-            i = parseInt(i);
-            j = parseInt(j);
+            let temp = queue.shift();
+            let i : number = -1, j : number = -1;
+            if(temp != undefined && temp[0] != undefined && temp[1] != undefined){
+                i = temp[0];
+                j = temp[1];
+            }
             arr.push([i, j]);
             if(i === x && j === y){
                 break;
@@ -260,6 +283,7 @@ export default function PathFinding() {
 
     return (
         <>
+            <div id="temp" data-row={-1} data-col={-1}></div>
             <h1 className="text-center text-4xl font-bold my-5">
                 Path-Finder
             </h1>
