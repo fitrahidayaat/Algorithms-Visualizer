@@ -1,9 +1,5 @@
 "use client";
-import { parse } from "path";
 import React, { useState } from "react";
-import Select from "react-select";
-import PriorityQueue from "../util/priority_queue";
-import { start } from "repl";
 
 export default function PathFinding() {
     const [mode, setMode] = useState("nothing");
