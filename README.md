@@ -1,5 +1,5 @@
 # Algorithms-Visualizer
-A web app that allows you to explore and compare different algorithms for path-finding and sorting on separate pages. On the path-finding page, you can choose from **Dijkstra** and **A*** algorithms for finding the shortest path between two points on a grid. On the sorting page, you can choose from **bubble sort**, **selection sort**, and **merge sort** algorithms for sorting an array of numbers.
+A web app that allows you to explore path-finding and sorting algorithms with visualization. On the path-finding page, it's using **Dijkstra** algorithms for finding the shortest path between two points on a grid. On the sorting page, you can choose from **bubble sort** and **selection sort** algorithms for sorting an array of numbers.
 
 This project is deployed on [https://algorithms-visualizer-ten.vercel.app/](https://algorithms-visualizer-ten.vercel.app/)
 
