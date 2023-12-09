@@ -6,7 +6,7 @@ export default function Card(props : any) {
     return (
         <>
             <Link className="cursor-pointer" href={props.href}>
-                <div className="w-96 shadow-md hover:shadow-2xl rounded transition-all bg-white border border-slate-300 rounded">
+                <div className="w-96 shadow-md hover:shadow-2xl rounded transition-all bg-white border border-slate-300">
                     <Image
                         src={props.src}
                         height={700}
